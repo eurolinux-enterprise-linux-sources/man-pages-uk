@@ -1,0 +1,143 @@
+#!/bin/bash
+# 20071026 man_compress hse@ukr.net http://wiki2man.sourceforge.net
+# Distributed under the terms of the GNU General Public License v3 or later
+
+version=0.2.8
+
+version() {
+echo "
+man_compress-$version
+
+Copyright (C) 2005 - 2007	hse@ukr.net http://wiki2man.sourceforge.net
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"
+}
+
+usage() {
+echo "
+This script compress manual pages.
+
+$ man_compress [--manpath=<manpath>] --archivator=<archivator>
+
+Options:
+
+    -p --manpath=<manpath>
+	Location not compressed manual pages.
+
+    -a --archivator=<archivator>
+	Archivator command. (gzip -9q)
+
+    -h --help
+	Print this help and exit.
+
+    -v --version
+	Print version and exit.
+"
+}
+
+checkutilities() {
+    Mesg="$1"
+    shift
+    while [ $# != 0  ]
+      do
+	if ( ! which "${1}" >/dev/null 2>&1 )
+	  then
+	    echo "Cannot find: $1 
+	    $Mesg"
+	    return 0
+	fi
+	shift
+      done
+    return 1
+}
+
+
+# Checking system:
+if ( checkutilities "Where am I?" awk echo ls )
+  then
+    exit 1
+fi
+
+
+# Edit to suite yours configuration:
+# Man path:
+#manpath=/usr/src/man
+
+# Archivator
+archivator='gzip -9q'
+
+# Configuration from command line:
+while [ $# != 0 ]
+  do
+    argument="$1"
+    name=`echo "${argument}" |awk -F'=' '{print $1}'`
+    argument=${argument##*=}
+
+    if [[ "$name" == -[pahv] ]] && [[ "$argument" == "$name" ]]
+       then
+	    argument="$2";
+	    shift;
+    fi
+
+    case "$name" in
+	'-p'|'--manpath' )
+	    manpath="$argument"
+	;;
+	'-a'|'--archivator' )
+	    archivator="$argument"
+	;;
+	'-h'|'--help' )
+	    usage
+	    exit 0
+	;;
+	'-v'|'--version' )
+	    version
+	    exit 0
+	;;
+	* )
+	    usage
+	    exit 1
+	;;
+    esac
+    shift
+  done
+  
+if [ -z "$manpath" ]
+  then
+    usage
+    exit 1
+fi
+
+archout=`echo "$archivator" |awk '{print $1}'`
+# Checking system:
+if ( checkutilities "Cannot found archivator command!" $archout )
+  then
+    exit 1
+fi
+
+
+for i in `ls $manpath |grep 'man'`
+  do
+	if [ -d $manpath/$i ]
+	  then
+		cd $manpath/$i/
+		for j in `ls $manpath/$i`
+		  do
+		    $archivator $manpath/$i/$j
+		  done
+	fi
+  done
+
+exit 0

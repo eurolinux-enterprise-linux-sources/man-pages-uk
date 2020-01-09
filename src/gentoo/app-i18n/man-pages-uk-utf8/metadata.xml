@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+    <herd>no-herd</herd>
+    <maintainer>
+	<email>docs@linux.org.ua wiki2man-develop@lists.sourceforge.net</email>
+	<description>hse</description>
+    </maintainer>
+    <longdescription>A collection of Ukranian translations of Linux manual pages."</longdescription>
+</pkgmetadata>

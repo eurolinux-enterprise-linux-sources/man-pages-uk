@@ -1,3 +1,4 @@
-# ELS - Enterprise Linux/EuroLinux Sources - man-pages-uk 
+# ELS - Enterprise Linux/EuroLinux Sources - man-pages-uk
+ 
 ## Usage:
-  Checkout branch or tag.
+  Checkout branch or tag. Use `make sources` to recreate  SOURCE0 archive.

@@ -1,0 +1,11 @@
+mem	kmem
+
+mem	port
+
+null	zero
+
+random	urandom
+
+vcs	vcsa
+
+# [[Category:Особливі файли]] [[Category:Сторінки підручника]]

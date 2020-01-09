@@ -1,0 +1,31 @@
+
+			    ПРОЕКТ MAN-PAGES-UK
+
+		http://docs.linux.org.ua/index.php/Man:Contents
+
+	  Проект "Переклад Сторінок Підручника Лінукс"
+
+В цьому пакеті знаходяться українські переклади Сторінок Підручника Linux.
+
+У файлах INSTALL та INSTALL.UK  є інструкції по встановленню на
+двох мовах.  В файлі NEWS.UK знаходяться новини чергової версії.
+ 
+Дані сторінки підручника розповсюджуються на умові Вільної Документаційної Ліцензії GNU 
+(GNU Free Documentation License) версії 1.2 за листопад 2002 чи пізнішої,
+опублікованої Free Software Foundation.
+
+САЙТ ПРОЕКТУ
+
+Проект зародився на основному сайті українізації та документації UNIX подібних
+операційних систем: DLOU http://docs.linux.org.ua
+
+Проект конвертації з вікі форматування у рофф:
+	http://wiki2man.sourceforge.net
+	wiki2man-develop@lists.sourceforge.net
+
+Сторінка проекту:
+	http://docs.linux.org.ua/index.php/Man:Contents
+	http://wiki2man.sourceforge.net
+	
+Адреса пошти:
+	docs@linux.org.ua

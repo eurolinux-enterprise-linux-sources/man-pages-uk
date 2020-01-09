@@ -1,0 +1,186 @@
+#!/bin/bash
+# 20071026 man_encode_converter hse@ukr.net http://wiki2man.sourceforge.net
+# Distributed under the terms of the GNU General Public License v3 or later
+
+version=0.2.8
+
+version() {
+echo "
+man_encode_converter-$version
+
+Copyright (C) 2005 - 2007	hse@ukr.net http://wiki2man.sourceforge.net
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"
+}
+
+usage() {
+echo "
+This script convert installed man page from one encoding to another.
+
+$ man_encode_converter [--manpath=<manpath>] --fromencode=<from encode>
+		     --toencode=<to encode> --archivator=<archivator for input>
+		     --ext=<file suffix> --archivator_out=<archivator for output>
+
+Options:
+    -p --manpath=<manpath>
+	Directory with installed manual pages.
+
+    -f --fromencode=<from encode>
+	Input man encoding. (koi8-r)
+
+    -t --toencode=<to encode>
+	Output man encoding. (utf8)
+
+    -a --archivator
+	Uncompress command. (gzip -dq)
+
+    -e --ext=<file suffix>
+	Archive input suffix. (gz)
+
+    -o --archivator_out=<archivator for output>
+	Compress command. (gzip -9q)
+
+    -h --help
+	Print this help and exit.
+	
+    -v --version
+	Print version and exit.
+"
+}
+
+checkutilities() {
+    Mesg="$1"
+    shift
+    while [ $# != 0  ]
+      do
+	if ( ! which "${1}" >/dev/null 2>&1 )
+	  then
+	    echo "Cannot find: $1 
+	    $Mesg"
+	    return 0
+	fi
+	shift
+      done
+    return 1
+}
+
+
+# Checking system:
+if ( checkutilities "Where am I?" awk cat echo iconv ls mv  )
+  then
+    exit 1
+fi
+
+# Edit to suite yours configuration:
+# Man path:
+#manpath=/usr/share/man/ru
+# From which encoding:
+fromencode='koi8-r'
+# To which encoding
+toencode='utf8'
+# If some page was compressed, which archivator and how to use and what extensions they have:
+archivator='gzip -dq'
+ext='gz'
+
+# If some page was compressed, which archivator and how to use to compress them:
+#archivator_out='bzip2 -zf9'
+archivator_out='gzip -9q'
+
+
+# Configuration from command line:
+while [ $# != 0 ]
+  do
+    argument="$1"
+    name=`echo "${argument}" |awk -F'=' '{print $1}'`
+    argument=${argument##*=}
+
+    if [[ "$name" == -[pftaeohv] ]] && [[ "$argument" == "$name" ]]
+       then
+	    argument="$2";
+	    shift;
+    fi
+
+    case "$name" in
+	'-p'|'--manpath' )
+	    manpath="$argument"
+	;;
+	'-f'|'--fromencode' )
+	    fromencode="$argument"
+	;;
+	'-t'|'--toencode' )
+	    toencode="$argument"
+	;;
+	'-a'|'--archivator' )
+	    archivator="$argument"
+	;;
+	'-e'|'--ext' )
+	    ext="$argument"
+	;;
+	'-o'|'--archivator_out' )
+	    archivator_out="$argument"
+	;;
+	'-h'|'--help' )
+	    usage
+	    exit 0
+	;;
+	'-v'|'--version' )
+	    version
+	    exit 0
+	;;
+	* )
+	    usage
+	    exit 1
+	;;
+    esac
+    shift
+  done
+
+if [ -z "$manpath" ]
+  then
+    usage
+    exit 1
+fi
+
+archin=`echo "$archivator" |awk '{print $1}'`
+archout=`echo "$archivator_out" |awk '{print $1}'`
+if ( checkutilities "No such archivator in this system!" $archin $archout )
+  then
+    exit 1
+fi
+
+
+for i in `ls $manpath |grep 'man'`
+  do
+	if [ -d $manpath/$i ]
+	  then
+		cd $manpath/$i/
+		for j in `ls $manpath/$i`
+		  do
+			if [[ "${j##*.}" == "$ext" ]]
+			  then
+				file=`echo $j |awk -F".$ext" '{print $1}'`
+				$archivator $manpath/$i/$j
+				cat $manpath/$i/$file |iconv -f $fromencode -t $toencode > $manpath/tmp
+				mv -f $manpath/tmp $manpath/$i/$file
+				$archivator_out $manpath/$i/$file
+			  else
+				cat $manpath/$i/$j |iconv -f $fromencode -t $toencode > $manpath/tmp
+				mv -f $manpath/tmp $manpath/$i/$j
+			fi
+		  done
+	fi
+  done
+
+exit 0
